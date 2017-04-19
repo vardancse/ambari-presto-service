@@ -14,19 +14,28 @@
 
 import uuid
 import os.path as path
-
+import os
 from resource_management.libraries.script.script import Script
 from resource_management.core.resources.system import Execute
 from common import PRESTO_RPM_URL, PRESTO_RPM_NAME, create_connectors,\
-    delete_connectors
+    delete_connectors, get_distro
 from presto_client import smoketest_presto, PrestoClient
 
 class Coordinator(Script):
     def install(self, env):
         from params import java_home
+        script_dir = os.path.dirname(os.path.realpath(__file__))
         Execute('wget --no-check-certificate {0}  -O /tmp/{1}'.format(PRESTO_RPM_URL, PRESTO_RPM_NAME))
-        Execute('export JAVA8_HOME={0} && rpm -i /tmp/{1}'.format(java_home, PRESTO_RPM_NAME))
+        if get_distro == 'ubuntu':
+            Execute('bash {0}/install/preinstall'.format(script_dir))
+            Execute('rpm2cpio /tmp/{0} | cpio -idmv'.format(PRESTO_RPM_NAME))
+        else:
+            Execute('export JAVA8_HOME={0} && rpm -i /tmp/{1}'.format(java_home, PRESTO_RPM_NAME))
         self.configure(env)
+        if get_distro == 'ubuntu':
+            Execute('bash {0}/install/postinstall'.format(script_dir))
+
+
 
     def stop(self, env):
         from params import daemon_control_script

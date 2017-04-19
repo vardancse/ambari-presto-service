@@ -44,3 +44,10 @@ def delete_connectors(node_properties, connectors_to_delete):
     for connector in connectors_list:
         connector_file_name = os.path.join(node_properties['plugin.config-dir'], connector + '.properties')
         Execute('rm -f {0}'.format(connector_file_name))
+
+def get_distro():
+    """
+    Name of your Linux distro (in lowercase).
+    """
+    with open("/etc/issue") as f:
+        return f.read().lower().split()[0]
