@@ -26,13 +26,13 @@ class Coordinator(Script):
         from params import java_home
         script_dir = os.path.dirname(os.path.realpath(__file__))
         Execute('wget --no-check-certificate {0}  -O /tmp/{1}'.format(PRESTO_RPM_URL, PRESTO_RPM_NAME))
-        if get_distro == 'ubuntu':
+        if get_distro() == 'ubuntu':
             Execute('bash {0}/install/preinstall'.format(script_dir))
             Execute('rpm2cpio /tmp/{0} | cpio -idmv'.format(PRESTO_RPM_NAME))
         else:
             Execute('export JAVA8_HOME={0} && rpm -i /tmp/{1}'.format(java_home, PRESTO_RPM_NAME))
         self.configure(env)
-        if get_distro == 'ubuntu':
+        if get_distro() == 'ubuntu':
             Execute('bash {0}/install/postinstall'.format(script_dir))
 
 
